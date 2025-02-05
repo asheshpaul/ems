@@ -75,6 +75,7 @@ class _CustomDatePickerPopupState extends State<CustomDatePickerPopup> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: const EdgeInsets.all(16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -120,31 +121,40 @@ class _CustomDatePickerPopupState extends State<CustomDatePickerPopup> {
             SizedBox(height: 20),
 
             // Bottom Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Show selected date instead of "Cancel"
-                _isDateSelected
-                    ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.date_range, color: Colors.blue),
-                    Text(
-                      DateFormat('d MMM yyyy').format(_selectedDate),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                )
-                    : TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("Cancel",
-                      style: TextStyle(color: Colors.blue)),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, _selectedDate),
-                  child: Text("Save"),
-                ),
-              ],
+            Container(
+              decoration: BoxDecoration(
+                  border: Border(
+                      top: BorderSide(width: 2, color: Colors.grey.shade300))),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Show selected date instead of "Cancel"
+                  _isDateSelected
+                      ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.today, color: Colors.blue),
+                      SizedBox(width: 8),
+                      Text(
+                        DateFormat('d MMM yyyy').format(_selectedDate),
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  )
+                      : TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("Cancel",
+                        style: TextStyle(color: Colors.blue)),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context, _selectedDate);
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: Text("Save"),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -153,11 +163,11 @@ class _CustomDatePickerPopupState extends State<CustomDatePickerPopup> {
   }
 
   Widget _buildQuickButton(String label, DateTime date) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
+    return FilledButton(
+      style: FilledButton.styleFrom(
         foregroundColor: date == _selectedDate ? Colors.white : Colors.blue,
         backgroundColor:
-        date == _selectedDate ? Colors.blue : Colors.blue.shade100,
+        date == _selectedDate ? Colors.blue : Color(0xFFEDF8FF),
       ),
       onPressed: () => _setDate(date),
       child: Text(label),
