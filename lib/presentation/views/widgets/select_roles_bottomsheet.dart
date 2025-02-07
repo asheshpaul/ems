@@ -30,6 +30,7 @@ Future<dynamic> buildShowModalBottomSheet(
                   "Product Owner",
                 ];
                 return Container(
+                  width: 400,
                   decoration: BoxDecoration(
                       border: Border(
                           bottom: BorderSide(

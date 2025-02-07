@@ -50,101 +50,122 @@ class EmployeeDetailsPage extends StatelessWidget {
                   ),
               ],
             ),
-            body: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            decoration: InputDecoration(
-                              hintText: "Employee name",
-                              prefixIcon: Icon(Icons.person_2_outlined),
+            body: LayoutBuilder(builder: (context, constraints) {
+              return Center(
+                child: SizedBox(
+                  width:
+                      constraints.maxWidth > 600 ? 500 : constraints.maxWidth,
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: "Employee name",
+                                    prefixIcon: Icon(Icons.person_2_outlined),
+                                  ),
+                                  controller: cubit.nameController,
+                                  onChanged: (value) {
+                                    context
+                                        .read<EmployeeDetailsCubit>()
+                                        .updateName(value);
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter the employee name';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(height: 16),
+                                TextFormField(
+                                  readOnly: true,
+                                  controller: cubit.roleController,
+                                  decoration: InputDecoration(
+                                    hintText: "Select Role",
+                                    prefixIcon: Icon(Icons.work_outline),
+                                    suffixIcon: Icon(Icons.arrow_drop_down),
+                                  ),
+                                  onTap: () {
+                                    buildShowModalBottomSheet(context, cubit);
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please select the employee role';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: DatePickerTextField(
+                                        controller: cubit.joiningDateController,
+                                        hintText: "Today",
+                                        updateDate: cubit.updateJoiningDate,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16.0),
+                                      child: Image.asset(
+                                        'assets/arrow.png',
+                                        height: 14,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: DatePickerTextField(
+                                        controller: cubit.leavingDateController,
+                                        isNoDate: !isEdit,
+                                        hintText: "No Date",
+                                        updateDate: cubit.updateLeavingDate,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            controller: cubit.nameController,
-                            onChanged: (value) {
-                              context
-                                  .read<EmployeeDetailsCubit>()
-                                  .updateName(value);
-                            },
                           ),
-                          SizedBox(height: 16),
-                          TextFormField(
-                            readOnly: true,
-                            controller: cubit.roleController,
-                            decoration: InputDecoration(
-                              hintText: "Select Role",
-                              prefixIcon: Icon(Icons.work_outline),
-                              suffixIcon: Icon(Icons.arrow_drop_down),
+                        ),
+                        Container(
+                          height: 64,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  top: BorderSide(
+                                      width: 2, color: Colors.grey.shade300))),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                CancelButton(),
+                                SizedBox(width: 16),
+                                SaveButton(
+                                  onPressed: () {
+                                    if (formKey.currentState!.validate()) {
+                                      context
+                                          .read<EmployeeDetailsCubit>()
+                                          .saveEmployee();
+                                      FocusScope.of(context).unfocus();
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
-                            onTap: () {
-                              buildShowModalBottomSheet(context, cubit);
-                            },
                           ),
-                          SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: DatePickerTextField(
-                                  controller: cubit.joiningDateController,
-                                  hintText: "Today",
-                                  updateDate: cubit.updateJoiningDate,
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Image.asset(
-                                  'assets/arrow.png',
-                                  height: 14,
-                                ),
-                              ),
-                              Expanded(
-                                child: DatePickerTextField(
-                                  controller: cubit.leavingDateController,
-                                  isNoDate: !isEdit,
-                                  hintText: "No Date",
-                                  updateDate: cubit.updateLeavingDate,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        )
+                      ],
                     ),
                   ),
-                  Container(
-                    height: 64,
-                    decoration: BoxDecoration(
-                        border: Border(
-                            top: BorderSide(
-                                width: 2, color: Colors.grey.shade300))),
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          CancelButton(),
-                          SizedBox(width: 16),
-                          SaveButton(
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                context
-                                    .read<EmployeeDetailsCubit>()
-                                    .saveEmployee();
-                                FocusScope.of(context).unfocus();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+                ),
+              );
+            }),
           );
         },
       ),
@@ -153,7 +174,9 @@ class EmployeeDetailsPage extends StatelessWidget {
 
   SnackBar buildSnackBar() {
     return SnackBar(
-      padding: EdgeInsets.zero,
+      margin: EdgeInsets.only(bottom: 64),
+      behavior: SnackBarBehavior.floating,
+      duration: Duration(seconds: 1),
       content: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(

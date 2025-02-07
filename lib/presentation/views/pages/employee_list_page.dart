@@ -29,17 +29,6 @@ class EmployeeListPage extends StatelessWidget {
               loaded: (employees) => loadedEmployees(cubit, employees),
               error: (message) => Center(child: Text(message)),
             ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: cubit,
-                      child: EmployeeDetailsPage(),
-                    ),
-                  )),
-              child: Icon(Icons.add),
-            ),
           );
         },
       ),
@@ -50,36 +39,83 @@ class EmployeeListPage extends StatelessWidget {
     final currentEmployees = cubit.getCurrentEmployees();
     final previousEmployees = cubit.getPreviousEmployees();
 
-    return Container(
-      color: AppColors.surface,
-      child: employees.isEmpty
-          ? Center(
-              child: Image.asset(
-                'assets/no-employee-records-found.png',
-                height: 245,
-              ),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Center(
+          child: Container(
+            width: constraints.maxWidth > 600 ? 500 : constraints.maxWidth,
+            color: AppColors.surface,
+            child: Column(
                     children: [
-                      if (currentEmployees.isNotEmpty)
-                        buildEmployeesSection(
-                          title: 'Current Employees',
-                          employees: currentEmployees,
+                      Expanded(
+                        child: employees.isEmpty
+                            ? Center(
+                          child: Image.asset(
+                            'assets/no-employee-records-found.png',
+                            height: 245,
+                          ),
+                        )
+                            : ListView(
+                          children: [
+                            if (currentEmployees.isNotEmpty)
+                              buildEmployeesSection(
+                                title: 'Current Employees',
+                                employees: currentEmployees,
+                              ),
+                            if (previousEmployees.isNotEmpty)
+                              buildEmployeesSection(
+                                title: 'Previous Employees',
+                                employees: previousEmployees,
+                              ),
+                          ],
                         ),
-                      if (previousEmployees.isNotEmpty)
-                        buildEmployeesSection(
-                          title: 'Previous Employees',
-                          employees: previousEmployees,
+                      ),
+                      // buildFooter(),
+                      Container(
+                        height: 84,
+                        color: Color(0xFFF2F2F2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            employees.isEmpty
+                                ? Spacer()
+                                :
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    'Swipe left to delete',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Color(0xFF949C9E),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 16.0),
+                              child: FloatingActionButton(
+                                onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => BlocProvider.value(
+                                        value: cubit,
+                                        child: EmployeeDetailsPage(),
+                                      ),
+                                    )),
+                                child: Icon(Icons.add),
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
                     ],
                   ),
-                ),
-                buildFooter(),
-              ],
-            ),
+          ),
+        );
+      }
     );
   }
 
