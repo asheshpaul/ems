@@ -1,0 +1,32 @@
+name: "Build & Release"
+
+on:
+  push:
+    branches:
+      - main  # Set a branch to deploy
+
+permissions:  # ADD THIS
+  contents: write
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.1'
+          architecture: x64
+
+      - run: flutter build apk --release
+
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/flutter-apk/*"
+          tag: v1.0.${{ github.run_number }}
